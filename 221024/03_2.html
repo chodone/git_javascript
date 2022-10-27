@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .titleColor {
+      color : blue
+    }
+  </style>
+</head>
+<body>
+  <!-- <h1>오늘의 TODO</h1> -->
+  <script>
+    const newH1 = document.createElement("h1")
+    newH1.innerText = '오늘의 TODO'
+    newH1.setAttribute("class", 'titleColor')
+    // const li1 = document.createElement('li')
+    // const li2 = document.createElement('li')
+    // const li3 = document.createElement('li')
+    
+    const newUl = document.createElement('ul')
+    
+    // newUl.append(li1, li2, li3)
+    
+    const bodyTag = document.querySelector("body")
+    bodyTag.appendChild(newH1)    // bodyTag 의 자식으로 newH1을 넣어주라
+    bodyTag.appendChild(newUl)
+    
+    todoLst = ['양치하기', '공부하기', '휴식하기']
+    for (let i=0; i < 3; i++){
+      const newLi = document.createElement("li")
+      newLi.innerText = todoLst[i]
+      newUl.appendChild(newLi)
+
+    }
+    
+    // const liTags = document.querySelectorAll("li")
+    // liTag.forEach((i) => {});
+    // liTag.forEach(function(i) {
+
+    // })
+    // console.log(liTags)
+
+    const newButton = document.createElement("button")
+    newButton.innerText = "TEST"
+    bodyTag.appendChild(newButton)
+    newButton.addEventListener('click', (event) => {
+      // console.log(event)
+      event.target.innerText += "1"
+      // alert("버튼 동작")
+    })
+  </script>
+</body>
+</html>

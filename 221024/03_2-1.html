@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  
+</head>
+<body>
+
+  <script>
+    const newH1 = document.createElement("h1")
+    newH1.innerText = '오늘의 TODO'
+    
+
+    const newUl = document.createElement('ul')
+    
+
+    
+    const bodyTag = document.querySelector("body")
+    bodyTag.appendChild(newH1)    // bodyTag 의 자식으로 newH1을 넣어주라
+    bodyTag.appendChild(newUl)
+    
+    todoLst = ['양치하기', '공부하기', '휴식하기']
+    for (let i=0; i < 3; i++){
+      const newLi = document.createElement('li')
+      newLi.innerText = todoLst[i]
+      newUl.appendChild(newLi)
+
+    }
+    
+  </script>
+</body>
+</html>

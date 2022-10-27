@@ -1,0 +1,145 @@
+# 6-3
+
+## articles - detail.html
+```html
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>DETAIL</h2>
+  <h3>{{ article.pk }} 번째 글</h3>
+  <hr>
+  <p>제목 : {{ article.title }}</p>
+  <p>내용 : {{ article.content }}</p>
+  <p>작성시각 : {{ article.created_at }}</p>
+  <p>수정시각 : {{ article.updated_at }}</p>
+  <hr>
+  {% if user == article.user %}
+    <a href="{% url 'articles:update' article.pk %}">[UPDATE]</a>
+    <form action="{% url 'articles:delete' article.pk %}" method="POST">
+      {% csrf_token %}
+      <input type="submit" value="DELETE">
+    </form>
+  {% endif %}
+  <a href="{% url 'articles:index' %}">[back]</a>
+  <hr>
+  <h4>댓글 목록</h4>
+  <ul>
+    {% for comment in comments %}
+      <li id="comment-list">
+        {{ comment.user }} - {{ comment.content }}
+        {% if user == comment.user %}
+          <form action="{% url 'articles:comments_delete' article.pk comment.pk %}" method="POST" class="d-inline">
+            {% csrf_token %}
+            <input type="submit" value="DELETE">
+          </form>
+        {% endif %}
+      </li>
+    {% empty %}
+      <p id="nocomment">댓글이 없어요..</p>
+    {% endfor %}
+  </ul>
+
+  <hr>
+  {% if request.user.is_authenticated %}
+    <form id="comment-form" data-article-id="{{ article.pk }}" action="{% url 'articles:comments_create' article.pk %}" method="POST">
+      {% csrf_token %}
+      {{ comment_form }}
+      <input type="submit">
+    </form>
+  {% else %}
+    <a href="{% url 'accounts:login' %}">[댓글을 작성하려면 로그인하세요.]</a>
+  {% endif %}
+{% endblock content %}
+
+{% block script %}
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const form = document.querySelector('#comment-form')
+    
+    const input = document.querySelector('[name=content]')
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    const newForm = new FormData()
+    const comments = document.querySelectorAll('#comment-list')
+    
+    
+    
+    
+    
+    form.addEventListener('submit', function (event) {
+      event.preventDefault()
+      
+
+
+      const articleId = event.target.dataset.articleId
+      newForm.append('content', input.value)
+
+      axios({
+        method: 'post',
+        url : `http://127.0.0.1:8000/articles/${articleId}/comments/`,
+        data : newForm,
+        headers: {'X-CSRFToken': csrftoken},
+
+      })
+      .then(response => {
+        const nocomment = document.querySelector('#nocomment')
+        if (nocomment !== null){
+          nocomment.remove()
+        }
+        const commentPk = response.data.commentPk
+        const articlePk = response.data.articlePk
+        ulTag = document.querySelector('ul')
+        commentLiTag = document.createElement('li')
+        commentLiTag.setAttribute('class', 'comment-list')
+
+        commentLiTag.innerHTML =  `
+          {{request.user.username}} - ${input.value}
+          <form action="/articles/${articlePk}/comments/${commentPk}/delete/" method="POST" class="d-inline">
+            {% csrf_token %}
+            <input type="submit" value="DELETE">
+          </form>
+        `
+        ulTag.append(commentLiTag)
+
+        input.value = ''
+        
+        
+        
+
+
+      })
+      
+    
+    })
+
+  </script>
+{% endblock script %}
+
+
+```
+
+
+## articles - views.py
+
+```py
+@require_POST
+def comments_create(request, pk):
+    if request.user.is_authenticated:
+        article = get_object_or_404(Article, pk=pk)
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.article = article
+            comment.user = request.user
+            comment.save()
+            context = {
+                'articlePk' : article.pk,
+                'commentPk' : comment.pk,
+            }
+            return JsonResponse(context)
+        print(comment_form)
+        return redirect('articles:detail', article.pk)
+    return redirect('accounts:login')
+
+```
+
+
